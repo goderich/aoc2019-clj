@@ -1,0 +1,5 @@
+* Advent of Code 2019 in Clojure
+
+This is my attempt at AoC2019 puzzles in Clojure running on Babashka.
+
+Expect more details soon.
