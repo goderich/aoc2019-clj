@@ -1,4 +1,5 @@
-(ns intcode)
+(ns intcode
+  (:require [helpers :refer [queue]]))
 
 (defn- get-code [state]
   (-> (:pos state)
@@ -47,16 +48,18 @@
         (assoc-in [:vec new-pos] new-val)
         (move-fwd 4))))
 
-(defmethod run-code 3 [{v :vec, pos :pos, i :input :as state}]
-  (-> state
-      (assoc-in [:vec (v (inc pos))] i)
-      (move-fwd 2)))
+(defmethod run-code 3 [{v :vec, pos :pos, in :input :as state}]
+  (let [i (peek in)]
+    (-> state
+        (assoc-in [:vec (v (inc pos))] i)
+        (update :input pop)
+        (move-fwd 2))))
 
 (defmethod run-code 4 [state]
   (let [i (get-value state 1)]
     (-> state
-        (update :output #(conj % i))
-        (move-fwd 2))))
+        (move-fwd 2)
+        (assoc :output i))))
 
 (defmethod run-code 5 [state]
   (let [x (get-value state 1)]
