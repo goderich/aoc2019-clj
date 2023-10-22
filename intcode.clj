@@ -96,14 +96,3 @@
      (if (= (get-code state) 99)
        state
        (recur (run-code state))))))
-
-(comment
-
-  (let [x (get-value state 1)
-        y (get-value state 2)
-        z
-        new-val (+ x y)
-        new-pos (v (+ pos 3))]
-    (-> state
-        (move-fwd 4)))
-  )
