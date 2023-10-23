@@ -91,11 +91,18 @@
         (assoc-in [:vec new-pos] new-val)
         (move-fwd 4))))
 
+(defn initialize
+  "Create a map from a vector and optional arguments."
+  ([v] (initialize v nil))
+  ([v input]
+   {:vec v, :pos 0, :input (queue input)}))
+
 (defn run
   "Main intcode fuction."
-  ([v] (run v nil))
-  ([v input]
-   (loop [state {:vec v, :pos 0, :input input, :output []}]
-     (if (= (get-code state) 99)
-       state
-       (recur (run-code state))))))
+  [m]
+  {:pre [(map? m)]}
+  (loop [state m]
+    (cond
+      (= 99 (get-code state)) state
+      (:output state) state
+      :else (recur (run-code state)))))
