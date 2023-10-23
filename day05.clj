@@ -11,7 +11,8 @@
 ;; part 1
 
 (-> input
-    (intcode/run 1)
+    (intcode/initialize 1)
+    intcode/run-until-halt
     :output
     last)
 ;; => 7259358
@@ -19,7 +20,8 @@
 ;; part 2
 
 (-> input
-    (intcode/run 5)
+    (intcode/initialize 5)
+    intcode/run
     :output
     first)
 ;; => 11826654

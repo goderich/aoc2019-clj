@@ -58,8 +58,8 @@
 (defmethod run-code 4 [state]
   (let [i (get-value state 1)]
     (-> state
-        (move-fwd 2)
-        (assoc :output i))))
+        (update :output #(conj % i))
+        (move-fwd 2))))
 
 (defmethod run-code 5 [state]
   (let [x (get-value state 1)]
@@ -95,14 +95,26 @@
   "Create a map from a vector and optional arguments."
   ([v] (initialize v nil))
   ([v input]
-   {:vec v, :pos 0, :input (queue input)}))
+   {:vec v, :pos 0, :input (queue input), :output []}))
 
 (defn run
-  "Main intcode fuction."
+  "Main intcode fuction.
+  Halts on either code 99, or upon receiving an output."
   [m]
   {:pre [(map? m)]}
   (loop [state m]
     (cond
       (= 99 (get-code state)) state
-      (:output state) state
+      (seq (:output state)) state
+      :else (recur (run-code state)))))
+
+(defn run-until-halt
+  "Run instructions, accumulating outputs.
+  Do not halt on output, but exit only on code 99.
+  This is required for day 5 part 1."
+  [m]
+  {:pre [(map? m)]}
+  (loop [state m]
+    (cond
+      (= 99 (get-code state)) state
       :else (recur (run-code state)))))
