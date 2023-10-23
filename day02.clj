@@ -12,7 +12,7 @@
   (let [v (-> input
               (assoc 1 x)
               (assoc 2 y))]
-    (first (:vec (intcode/run v)))))
+    (-> v intcode/initialize intcode/run :vec first)))
 
 ;; part 1
 
