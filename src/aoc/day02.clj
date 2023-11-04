@@ -1,6 +1,6 @@
-(ns day02
+(ns aoc.day02
   (:require [clojure.string :as str]
-            [intcode]))
+            [lib.intcode :as intcode]))
 
 (def input
   (as-> (slurp "inputs/day02.txt") _

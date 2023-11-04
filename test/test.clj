@@ -1,6 +1,6 @@
 (ns test
   (:require [clojure.test :as t :refer [deftest is testing]]
-            [intcode]))
+            [lib.intcode :as intcode]))
 
 (defn- init-run
   ([v] (init-run v nil))

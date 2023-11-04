@@ -1,4 +1,4 @@
-(ns day01
+(ns aoc.day01
   (:require [clojure.string :as str]))
 
 (def input (map #(Integer/parseInt %) (str/split-lines (slurp "inputs/day01.txt"))))

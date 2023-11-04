@@ -1,4 +1,4 @@
-(ns helpers)
+(ns lib.helpers)
 
 (defn queue
   "Helper function to create queues.

@@ -1,5 +1,5 @@
-(ns intcode
-  (:require [helpers :refer [queue]]))
+(ns lib.intcode
+  (:require [lib.helpers :refer [queue]]))
 
 (defn- get-code [state]
   (-> (:pos state)

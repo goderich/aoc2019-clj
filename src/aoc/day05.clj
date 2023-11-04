@@ -1,12 +1,12 @@
-(ns day05
+(ns aoc.day05
   (:require [clojure.string :as str]
-            [intcode]))
+            [lib.intcode :as intcode]))
 
 (def input
-  (as-> (slurp "inputs/day05.txt") _
-    (str/trim-newline _)
-    (str/split _ #",")
-    (mapv #(Integer/parseInt %) _)))
+  (as-> (slurp "inputs/day05.txt") it
+    (str/trim-newline it)
+    (str/split it #",")
+    (mapv #(Integer/parseInt %) it)))
 
 ;; part 1
 
