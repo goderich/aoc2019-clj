@@ -1,6 +1,7 @@
 (ns test
   (:require [clojure.test :as t :refer [deftest is testing]]
-            [lib.intcode :as intcode]))
+            [lib.intcode :as intcode]
+            [lib.helpers :refer [queue]]))
 
 (defn- init-run
   ([v] (init-run v nil))
@@ -50,16 +51,29 @@
 
 (deftest day07
   (testing "Simple looping"
-    (is (= 54321
-           (let [v [3,23,3,24,1002,24,10,24,1002,23,-1,23,
-                    101,5,23,23,1,24,23,23,4,23,99,0,0]]
-             (loop [phases [0 1 2 3 4]
+    (is (= 43210
+           (let [v [3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0]]
+             (loop [amps (mapv #(intcode/initialize v %) [4 3 2 1 0])
                     input 0]
-               (if (empty? phases)
+               (if (empty? amps)
                  input
-                 (let [in-queue [(first phases) input]
-                       out-state (init-run v in-queue)]
-                   (recur (rest phases) (output out-state))))))))))
+                 (let [amp (update (first amps) :input #(conj % input))
+                       output (first (:output (intcode/run amp)))]
+                   (recur (rest amps) output))))))))
+
+  (testing "Feedback loop"
+    (is (= 139629729
+           (let [v [3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,
+                    27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5]]
+             (loop [amps (queue (map #(intcode/initialize v %) [9 8 7 6 5]))
+                    input 0]
+               (let [amp (-> (peek amps)
+                             (update :input #(conj % input))
+                             (intcode/run))
+                     output (first (:output amp))]
+                 (if output
+                   (recur (conj (pop amps) (update amp :output pop)) output)
+                   input))))))))
 
 (def test-results
   (t/run-tests))
