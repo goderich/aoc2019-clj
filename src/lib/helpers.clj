@@ -8,3 +8,6 @@
    (if (seqable? arg)
      (reduce conj clojure.lang.PersistentQueue/EMPTY arg)
      (conj clojure.lang.PersistentQueue/EMPTY arg))))
+
+(defn int->digits [n]
+  (map #(Character/digit % 10) (str n)))

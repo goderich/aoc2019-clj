@@ -1,13 +1,10 @@
 (ns lib.intcode
-  (:require [lib.helpers :refer [queue]]))
+  (:require [lib.helpers :refer [queue int->digits]]))
 
 (defn- get-code [state]
   (-> (:pos state)
       ((:vec state))
       (rem 100)))
-
-(defn- int->digits [n]
-  (map #(Character/digit % 10) (str n)))
 
 (defn- move-fwd
   "Move pointer forward by N steps."
