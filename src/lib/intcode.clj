@@ -9,19 +9,19 @@
 (defn- move-fwd
   "Move pointer forward by N steps."
   [state n]
-  (update state :pos #(+ % n)))
+  (update state :pos + n))
 
 (defn- get-value
-  "Get a value from the vector based on mode.
+  "Get a value from the intcode computer memory based on mode.
   Positional mode (0): extract value from position at index.
   Immediate mode (1): extract value from current position.
   Relative mode (2): extract value relative to a base (see day 9)."
   [{m :mem, pos :pos, rb :relbase} index]
   (let [mode (-> pos m int->digits reverse (nth (inc index) 0))]
     (case mode
-      0 (m (m (+ pos index)))
-      1 (m (+ pos index))
-      2 (m (+ rb (m (+ pos index)))))))
+      0 (m (m (+ pos index)) 0)
+      1 (m (+ pos index) 0)
+      2 (m (+ rb (m (+ pos index))) 0))))
 
 (defmulti ^:private run-code
   "Execute a single code instruction and move the pointer.
@@ -48,21 +48,21 @@
         (move-fwd 4))))
 
 (defmethod run-code 3 [{m :mem, pos :pos, in :input :as state}]
-  (let [i (peek in)]
+  (let [x (peek in)]
     (-> state
-        (assoc-in [:mem (m (inc pos))] i)
+        (assoc-in [:mem (m (inc pos))] x)
         (update :input pop)
         (move-fwd 2))))
 
 (defmethod run-code 4 [state]
-  (let [i (get-value state 1)]
+  (let [x (get-value state 1)]
     (-> state
-        (update :output #(conj % i))
+        (update :output conj x)
         (move-fwd 2))))
 
 (defmethod run-code 5 [state]
   (let [x (get-value state 1)]
-    (if (not (zero? x))
+    (if-not (zero? x)
       (assoc state :pos (get-value state 2))
       (move-fwd state 3))))
 
@@ -98,7 +98,8 @@
 
 (defn initialize
   "Create a map from a vector and optional arguments.
-  Use a sorted map instead of a vec"
+  Use a sorted map instead of a vector to represent
+  the intcode computer memory."
   ([v] (initialize v nil))
   ([v input]
    {:mem (into (sorted-map) (zipmap (range) v)),
