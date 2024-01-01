@@ -13,13 +13,13 @@
 (deftest day02
   (testing "Basic functionality"
     (is
-     (= (:vec (init-run [1,9,10,3,2,3,11,0,99,30,40,50]))
+     (= (vals (:mem (init-run [1,9,10,3,2,3,11,0,99,30,40,50])))
         [3500 9 10 70 2 3 11 0 99 30 40 50]))))
 
 (deftest day05
   (testing "Modes"
     (is
-     (= (:vec (init-run [1002,4,3,4,33]))
+     (= (vals (:mem (init-run [1002,4,3,4,33])))
         [1002 4 3 4 99])))
 
   (testing "Optcodes 3 and 4"
@@ -74,6 +74,19 @@
                  (if output
                    (recur (conj (pop amps) (update amp :output pop)) output)
                    input))))))))
+
+(deftest day09
+  (testing "Basic day 9 features"
+
+    (testing "Relative mode"
+      (let [v [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]]
+        (is (= v
+               (vals (:mem (intcode/run (intcode/initialize v))))))))
+
+    (testing "Large memory"
+      (let [v [104,1125899906842624,99]]
+        (is (= 1125899906842624
+               (-> v intcode/initialize intcode/run :output first)))))))
 
 (def test-results
   (t/run-tests))
