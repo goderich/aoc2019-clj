@@ -3,3 +3,10 @@
 This is my attempt at AoC2019 puzzles in Clojure running on Babashka.
 
 Expect more details soon.
+
+Notes:
+Day 9 required me to change the representation of memory from a simple vector to a map
+(in order to be able to access addresses beyond the initial program).
+I used a sorted map to be able to test it easily against vectors,
+by extracting the =vals= from it directly
+(a standard map does not guarantee the order of its items).

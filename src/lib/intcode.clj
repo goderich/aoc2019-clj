@@ -17,11 +17,26 @@
   Immediate mode (1): extract value from current position.
   Relative mode (2): extract value relative to a base (see day 9)."
   [{m :mem, pos :pos, rb :relbase} index]
-  (let [mode (-> pos m int->digits reverse (nth (inc index) 0))]
+  (let [mode (-> pos m int->digits reverse (nth (inc index) 0))
+        num (m (+ pos index))] ; numeric value at address
     (case mode
-      0 (m (m (+ pos index)) 0)
-      1 (m (+ pos index) 0)
-      2 (m (+ rb (m (+ pos index))) 0))))
+      0 (m num 0)
+      1 num
+      2 (m (+ rb num) 0))))
+
+(defn- get-position
+  "Get a position index in the intcode computer memory based on mode,
+  for instructions that write to the memory.
+  Positional mode (0): extract address from position at index.
+  Immediate mode: impossible (see day 5).
+  Relative mode (2): address relative to a base (see day 9)."
+  [{m :mem, pos :pos, rb :relbase} index]
+  (let [mode (-> pos m int->digits reverse (nth (inc index) 0))
+        num (m (+ pos index))] ; numeric value at address
+    (case mode
+      0 num
+      1 (throw (Throwable. "Called immediate mode in positional argument."))
+      2 (+ rb num))))
 
 (defmulti ^:private run-code
   "Execute a single code instruction and move the pointer.
@@ -33,7 +48,7 @@
   (let [x (get-value state 1)
         y (get-value state 2)
         new-val (+ x y)
-        new-pos (m (+ pos 3))]
+        new-pos (get-position state 3)]
     (-> state
         (assoc-in [:mem new-pos] new-val)
         (move-fwd 4))))
@@ -42,15 +57,16 @@
   (let [x (get-value state 1)
         y (get-value state 2)
         new-val (* x y)
-        new-pos (m (+ pos 3))]
+        new-pos (get-position state 3)]
     (-> state
         (assoc-in [:mem new-pos] new-val)
         (move-fwd 4))))
 
 (defmethod run-code 3 [{m :mem, pos :pos, in :input :as state}]
-  (let [x (peek in)]
+  (let [x (peek in)
+        pos (get-position state 1)]
     (-> state
-        (assoc-in [:mem (m (inc pos))] x)
+        (assoc-in [:mem pos] x)
         (update :input pop)
         (move-fwd 2))))
 
@@ -76,7 +92,7 @@
   (let [x (get-value state 1)
         y (get-value state 2)
         new-val (if (< x y) 1 0)
-        new-pos (m (+ pos 3))]
+        new-pos (get-position state 3)]
     (-> state
         (assoc-in [:mem new-pos] new-val)
         (move-fwd 4))))
@@ -85,7 +101,7 @@
   (let [x (get-value state 1)
         y (get-value state 2)
         new-val (if (= x y) 1 0)
-        new-pos (m (+ pos 3))]
+        new-pos (get-position state 3)]
     (-> state
         (assoc-in [:mem new-pos] new-val)
         (move-fwd 4))))
@@ -102,11 +118,12 @@
   the intcode computer memory."
   ([v] (initialize v nil))
   ([v input]
-   {:mem (into (sorted-map) (zipmap (range) v)),
-    :pos 0,
-    :input (queue input),
-    :output [],
-    :relbase 0}))
+   (let [v (map bigint v)]
+     {:mem (into (sorted-map) (zipmap (range) v)),
+      :pos 0,
+      :input (queue input),
+      :output [],
+      :relbase 0})))
 
 (defn run
   "Main intcode fuction.
