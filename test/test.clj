@@ -86,7 +86,15 @@
     (testing "Large memory"
       (let [v [104,1125899906842624,99]]
         (is (= 1125899906842624
-               (-> v intcode/initialize intcode/run :output first)))))))
+               (-> v intcode/initialize intcode/run :output first)))))
+
+    ;; the infamous error 203
+    ;; https://www.reddit.com/r/adventofcode/comments/e8aw9j/2019_day_9_part_1_how_to_fix_203_error/
+    (testing "Relative mode in opcode 3"
+      (let [v [109, 1, 203, 2, 204, 2, 99]
+            input 8]
+        (is (= input
+               (-> v (intcode/initialize input) intcode/run :output first)))))))
 
 (def test-results
   (t/run-tests))
